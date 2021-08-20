@@ -1,13 +1,14 @@
-import { useGenerator, useIterable } from 'react-iterable';
+import { render } from 'react-dom';
+import { useGenerator } from '../src';
 
 export const Tutorial = () => {
-  const {value: message, next} = useGenerator(function* () {
+  const iteratorResult = useGenerator<string>(function* () {
     yield 'Setup password';
     yield 'Setup username';
     yield 'Setup avatar';
   }, []);
 
-  if (message == null) {
+  if (iteratorResult.done) {
     return (
       <div>
         Tutorial completed!
@@ -17,8 +18,10 @@ export const Tutorial = () => {
 
   return (
     <div>
-      <h1>{message}</h1>
-      <button onClick={() => next(undefined)}>next</button>
+      <h1>{iteratorResult.value}</h1>
+      <button onClick={() => iteratorResult.next()}>next</button>
     </div>
   );
 }
+
+render(<Tutorial />, document.getElementById('root'));

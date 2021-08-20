@@ -2,9 +2,9 @@
 import { useCallback, useMemo, useReducer } from 'react';
 
 export interface BaseUseIteratorResponse<TReturn, TNext> {
-  next: (...args: [TNext]) => void;
-  return: (...args: [TReturn]) => void;
-  throw: (...args: [unknown]) => void;
+  next: (...args: TNext extends undefined ? [] : [TNext]) => void;
+  return: (arg: TReturn) => void;
+  throw: (arg: unknown) => void;
 }
 
 export interface UseIteratorIncompleteResponse<T, TReturn, TNext> extends BaseUseIteratorResponse<TReturn, TNext> {
@@ -34,14 +34,14 @@ const reducer = <T, TReturn>(
   return next;
 };
 
-export const useIterator = <T, TReturn, TNext>(
+export const useIterator = <T, TReturn = void, TNext = undefined>(
   iterator: Iterator<T, TReturn, TNext>,
 ): UseIteratorResponse<T, TReturn, TNext> => {
   const initialState = useMemo(() => iterator.next(), []);
   const [result, dispatch] = useReducer(reducer, initialState);
 
-  const next = useCallback((next: TNext) => {
-    const res = iterator.next(next);
+  const next = useCallback((next?: TNext) => {
+    const res = iterator.next(next as TNext);
     dispatch(res);
   }, [iterator, dispatch]);
 
@@ -57,21 +57,11 @@ export const useIterator = <T, TReturn, TNext>(
     dispatch(res);
   }, [iterator, dispatch]);
 
-  if (result.done) {
-    return {
-      done: result.done,
-      value: result.value as TReturn,
-      next,
-      return: return_,
-      throw: throw_,
-    };
-  }
-
-  return {
+  return useMemo(() => ({
     done: result.done,
     value: result.value as T,
     next,
     return: return_,
     throw: throw_,
-  };
+  }), [result, next, return_, throw_]) as UseIteratorResponse<T, TReturn, TNext>;
 };

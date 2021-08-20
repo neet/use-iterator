@@ -1,11 +1,11 @@
-import { useCallback, useDebugValue, useReducer } from "react";
+import { useCallback, useDebugValue, useMemo, useReducer } from "react";
 import { UseIteratorResponse } from "./useIterator";
 
 // --- reducer 
 type ReducerState<T, TReturn> = {
   value: T | TReturn | undefined;
   error: unknown | undefined;
-  done: boolean | undefined;
+  done: boolean;
   loading: boolean;
 }
 
@@ -28,28 +28,30 @@ const initialState: ReducerState<unknown, unknown> = {
 export type UseAsyncIteratorLoadingResponse<T, TReturn, TNext> = UseIteratorResponse<T, TReturn, TNext> & {
   value: T | TReturn | undefined;
   loading: true;
+  error?: unknown;
 }
 
 export type UseAsyncIteratorLoadedResponse<T, TReturn, TNext> = UseIteratorResponse<T, TReturn, TNext> & {
   value: T | TReturn;
   loading: false;
+  error?: unknown;
 }
 
 export type UseAsyncIteratorResponse<T, TReturn, TNext> =
   | UseAsyncIteratorLoadingResponse<T, TReturn, TNext>
   | UseAsyncIteratorLoadedResponse<T, TReturn, TNext>;
 
-export const useAsyncIterator = <T, TReturn, TNext>(
+export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
   asyncIterator: AsyncIterator<T, TReturn, TNext>,
 ): UseAsyncIteratorResponse<T, TReturn, TNext> => {
   const [result, update] = useReducer(reducer, initialState);
 
-  const next = useCallback((arg: TNext) => {
+  const next = useCallback((arg?: TNext) => {
     update({ loading: true });
 
     void asyncIterator
-      .next(arg)
-      .then(update)
+      .next(arg as TNext)
+      .then((r) => update({ value: r.value }))
       .catch((error) => update({ error }))
       .finally(() => update({ loading: false }));
   }, [asyncIterator, update]);
@@ -59,7 +61,7 @@ export const useAsyncIterator = <T, TReturn, TNext>(
 
     void asyncIterator
       .return?.(value)
-      .then(update)
+      .then((r) => update({ value: r.value }))
       .catch((error) => update({ error }))
       .finally(() => update({ loading: false }));
   }, [asyncIterator, update]);
@@ -69,28 +71,17 @@ export const useAsyncIterator = <T, TReturn, TNext>(
 
     void asyncIterator
       .throw?.(value)
-      .then(update)
+      .then((r) => update({ value: r.value }))
       .catch((error) => update({ error }))
       .finally(() => update({ loading: false }));
   }, [asyncIterator, update]);
 
-  if (result.done) {
-    return {
-      done: result.done,
-      value: result.value as TReturn,
-      loading: result.loading,
-      next,
-      return: return_,
-      throw: throw_,
-    };
-  }
-
-  return {
+  return useMemo(() => ({
     done: result.done,
-    value: result.value as T,
+    value: result.value,
     loading: result.loading,
     next,
     return: return_,
     throw: throw_,
-  };
+  }), [result, next, return_, throw_]) as UseAsyncIteratorResponse<T, TReturn, TNext>;
 }

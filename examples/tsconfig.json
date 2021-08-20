@@ -1,10 +1,7 @@
 {
-  "extends": "..",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {
-      "react-iterable": ["../src/index.ts"]
-    }
   },
   "include": ["./**/*"]
 }
