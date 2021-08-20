@@ -1,6 +1,6 @@
 # use-iterator
 
-React hooks collections for JavaScript's Iterator/generator.
+React hook collections for JavaScript's Iterator/generator.
 
 #### `useGenerator(generator, deps)`
 
@@ -36,7 +36,7 @@ result.loading; // equals to true while loading
 result.value; // equals to the response from the URL above
 ```
 
-### `useIterable(iterable)`
+#### `useIterable(iterable)`
 
 Creates a reactive state and a dispatcher from a iterable object.
 
@@ -51,7 +51,7 @@ result.next();
 result.value === 'b';
 ```
 
-### `useAsyncIterable(asyncIterable)`
+#### `useAsyncIterable(asyncIterable)`
 
 Creates a reactive state and a dispatcher from a iterable object. Similar to `useIterable` but you can yield promise from it.
 
@@ -78,7 +78,7 @@ result.loading; // equals to true while loading
 result.value === 1;
 ```
 
-### `useIterator(iterator)`
+#### `useIterator(iterator)`
 
 A low-level hook for `useIterable` and `useGenerator`. Accepts iterator object and returns a reactive state and a dispatcher.
 
@@ -90,7 +90,7 @@ const result = useIterator({
 });
 ```
 
-### `useAsyncIterator(iterator)`
+#### `useAsyncIterator(iterator)`
 
 A low-level hook for `useAsyncIterable` and `useAsyncGenerator`. Accepts async iterator object and returns a reactive state and a dispatcher.
 
