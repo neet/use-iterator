@@ -1,0 +1,48 @@
+{
+  "name": "use-iteartor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/neetbox/use-iteartor.git",
+  "author": "Ryo Igarashi <n33t5hin@gmail.com>",
+  "license": "MIT",
+  "packageManager": "yarn@3.0.1",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/react-hooks": "^7.0.1",
+    "@types/jest": "^27.0.1",
+    "@types/react": "^17.0.19",
+    "jest": "^27.0.6",
+    "prettier": "^2.3.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.3.5"
+  },
+  "peerDependencies": {
+    "react": "*"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "globals": {
+      "ts-jest": {
+        "tsconfig": {
+          "jsx": "react-jsx"
+        }
+      }
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/dist/"
+    ],
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx}",
+      "!**/*.d.ts",
+      "!**/node_modules/**"
+    ]
+  }
+}

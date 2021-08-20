@@ -1,0 +1,10 @@
+{
+  "extends": "..",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "react-iterable": ["../src/index.ts"]
+    }
+  },
+  "include": ["./**/*"]
+}
