@@ -25,7 +25,7 @@ result.value === 'bbb';
 Creates a reactive state and a dispatcher from a generator function. Similar to `useGenerator` but you can yield promise from it.
 
 ```js
-const result = useGenerator<string>(function* () {
+const result = useAsyncGenerator<string>(function* () {
   yield fetch('https://example.com/1').then((r) => r.json());
   yield fetch('https://example.com/2').then((r) => r.json());
   yield fetch('https://example.com/3').then((r) => r.json());
