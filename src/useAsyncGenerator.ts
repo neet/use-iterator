@@ -8,4 +8,4 @@ export const useAsyncGenerator = <T, TReturn = void, TNext = undefined>(
   const asyncGeneratorFn = useCallback(() => fn(), deps);
   const asyncGenerator = useMemo(() => asyncGeneratorFn(), [asyncGeneratorFn]);
   return useAsyncIterator(asyncGenerator);
-}
+};

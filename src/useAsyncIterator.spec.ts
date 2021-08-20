@@ -4,13 +4,16 @@ import { renderHook } from '@testing-library/react-hooks';
 import { useAsyncIterator } from './useAsyncIterator';
 
 test('useAsyncIterator', async () => {
-  const { result, waitForNextUpdate } = renderHook(useAsyncIterator, {
-    initialProps: (async function* () {
-      yield 'a';
-      yield 'b';
-      yield 'c';
-    })(),
-  });
+  const { result, waitForNextUpdate } = renderHook(
+    (prop) => useAsyncIterator<string>(prop),
+    {
+      initialProps: (async function* () {
+        yield 'a';
+        yield 'b';
+        yield 'c';
+      })(),
+    },
+  );
 
   act(result.current.next);
   await waitForNextUpdate();
@@ -32,4 +35,3 @@ test('useAsyncIterator', async () => {
   expect(result.current.value).toBeUndefined();
   expect(result.current.done).toBe(true);
 });
-

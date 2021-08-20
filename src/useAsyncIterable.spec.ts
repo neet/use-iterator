@@ -32,4 +32,3 @@ test('useAsyncIterable', async () => {
   expect(result.current.value).toBeUndefined();
   expect(result.current.done).toBe(true);
 });
-

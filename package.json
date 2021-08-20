@@ -1,30 +1,51 @@
 {
-  "name": "use-iteartor",
+  "name": "use-iterator",
   "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/neetbox/use-iteartor.git",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "repository": "https://github.com/neet/use-iterator.git",
   "author": "Ryo Igarashi <n33t5hin@gmail.com>",
   "license": "MIT",
   "packageManager": "yarn@3.0.1",
   "scripts": {
-    "test": "jest",
-    "dev": "parcel ./examples/index.html",
-    "build": "tsc"
+    "test": "yarn run test:jest && yarn run test:eslint",
+    "build": "tsc",
+    "test:jest": "jest --coverage",
+    "test:eslint": "eslint -c .eslintrc.json ./src/**/*.ts",
+    "dev": "parcel ./examples/index.html"
   },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/__tests__",
+    "!**/__mocks__"
+  ],
   "devDependencies": {
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/git": "^9.0.0",
     "@testing-library/react": "^12.0.0",
     "@testing-library/react-hooks": "^7.0.1",
     "@types/jest": "^27.0.1",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/parser": "^4.29.2",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-node": "^0.3.6",
+    "eslint-plugin-import": "^2.24.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "jest": "^27.0.6",
     "masto": "^4.1.10",
+    "parcel": "^2.0.0-rc.0",
     "prettier": "^2.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-use": "^17.2.4",
+    "semantic-release": "^17.4.5",
     "ts-jest": "^27.0.5",
-    "parcel": "^2.0.0-rc.0",
     "typescript": "^4.3.5"
   },
   "peerDependencies": {
@@ -45,7 +66,7 @@
       "<rootDir>/dist/"
     ],
     "collectCoverageFrom": [
-      "**/*.{ts,tsx}",
+      "src/**/*.{ts,tsx}",
       "!**/*.d.ts",
       "!**/node_modules/**"
     ]

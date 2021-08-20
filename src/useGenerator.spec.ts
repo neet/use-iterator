@@ -4,7 +4,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { useGenerator } from './useGenerator';
 
 test('useGenerator', () => {
-  const { result } = renderHook((p) => useGenerator(...p), {
+  const { result } = renderHook((p) => useGenerator<string>(...p), {
     initialProps: [
       function* () {
         yield 'a';

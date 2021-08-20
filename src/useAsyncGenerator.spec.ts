@@ -4,16 +4,19 @@ import { renderHook } from '@testing-library/react-hooks';
 import { useAsyncGenerator } from './useAsyncGenerator';
 
 test('useAsyncGenerator', async () => {
-  const { result, waitForNextUpdate } = renderHook((p) => useAsyncGenerator(...p), {
-    initialProps: [
-      async function* () {
-        yield 'a';
-        yield 'b';
-        yield 'c';
-      },
-      [],
-    ] as const,
-  });
+  const { result, waitForNextUpdate } = renderHook(
+    (props) => useAsyncGenerator<string>(...props),
+    {
+      initialProps: [
+        async function* () {
+          yield 'a';
+          yield 'b';
+          yield 'c';
+        },
+        [],
+      ] as const,
+    },
+  );
 
   act(result.current.next);
   await waitForNextUpdate();

@@ -4,7 +4,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { useIterator } from './useIterator';
 
 test('useIterable', () => {
-  const { result } = renderHook(useIterator, {
+  const { result } = renderHook((props) => useIterator<string>(props), {
     initialProps: (function* () {
       yield 'a';
       yield 'b';
