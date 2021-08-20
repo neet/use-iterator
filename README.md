@@ -1,5 +1,9 @@
 # use-iterator
 
+[![npm](https://img.shields.io/npm/v/use-iterator.svg)](https://www.npmjs.com/package/use-iterator)
+[![CI](https://github.com/neet/use-iterator/actions/workflows/ci.yml/badge.svg)](https://github.com/neet/use-iterator/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/neet/use-iterator/branch/main/graph/badge.svg?token=TH4BNCOPMB)](https://codecov.io/gh/neet/use-iterator)
+
 React hook collections for JavaScript's Iterator/generator.
 
 #### `useGenerator(generator, deps)`
