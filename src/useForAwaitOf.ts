@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { useAsyncIterator, UseAsyncIteratorResponse } from './useAsyncIterator';
 
-export const useForAwaitOf = <T>(
-  asyncIterator: AsyncIterator<T>,
-): UseAsyncIteratorResponse<T, void, undefined> => {
+export const useForAwaitOf = <T, TReturn = void>(
+  asyncIterator: AsyncIterator<T, TReturn, void>,
+): UseAsyncIteratorResponse<T, TReturn, void> => {
   const result = useAsyncIterator(asyncIterator);
 
   useEffect(() => {

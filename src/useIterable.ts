@@ -3,7 +3,7 @@ import { useIterator, UseIteratorResponse } from './useIterator';
 
 export const useIterable = <T>(
   iterable: Iterable<T>,
-): UseIteratorResponse<T, void, undefined> => {
+): UseIteratorResponse<T, void, void> => {
   const iterator = useMemo(() => {
     return iterable[Symbol.iterator]();
   }, [iterable]);
