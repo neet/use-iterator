@@ -1,5 +1,4 @@
-import { useCallback, useMemo, useReducer } from 'react';
-import { UseIteratorResponse } from './useIterator';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 
 // --- reducer
 type ReducerState<T, TReturn> = {
@@ -25,17 +24,25 @@ const initialState: ReducerState<unknown, unknown> = {
 };
 
 // -- response
+export interface BaseUseAsyncIteratorResponse<TReturn, TNext> {
+  next: (...args: TNext extends undefined ? [] : [TNext]) => Promise<void>;
+  return: (arg: TReturn) => Promise<void>;
+  throw: (arg: unknown) => Promise<void>;
+}
+
 export type UseAsyncIteratorLoadingResponse<T, TReturn, TNext> =
-  UseIteratorResponse<T, TReturn, TNext> & {
+  BaseUseAsyncIteratorResponse<TReturn, TNext> & {
     value: T | TReturn | undefined;
     loading: true;
+    done: boolean;
     error?: unknown;
   };
 
 export type UseAsyncIteratorLoadedResponse<T, TReturn, TNext> =
-  UseIteratorResponse<T, TReturn, TNext> & {
+  BaseUseAsyncIteratorResponse<TReturn, TNext> & {
     value: T | TReturn;
     loading: false;
+    done: boolean;
     error?: unknown;
   };
 
@@ -48,11 +55,15 @@ export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
 ): UseAsyncIteratorResponse<T, TReturn, TNext> => {
   const [result, update] = useReducer(reducer, initialState);
 
+  useEffect(() => {
+    update(initialState);
+  }, [asyncIterator]);
+
   const next = useCallback(
     (arg?: TNext) => {
       update({ loading: true });
 
-      void asyncIterator
+      return asyncIterator
         .next(arg as TNext)
         .then((r) => update({ value: r.value, done: r.done }))
         .catch((error) => update({ error }))
@@ -62,10 +73,10 @@ export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
   );
 
   const return_ = useCallback(
-    async (value: TReturn) => {
+    (value: TReturn) => {
       update({ loading: true });
 
-      void asyncIterator
+      return asyncIterator
         .return?.(value)
         .then((r) => update({ value: r.value, done: r.done }))
         .catch((error) => update({ error }))
@@ -75,10 +86,10 @@ export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
   );
 
   const throw_ = useCallback(
-    async (value: unknown) => {
+    (value: unknown) => {
       update({ loading: true });
 
-      void asyncIterator
+      return asyncIterator
         .throw?.(value)
         .then((r) => update({ value: r.value, done: r.done }))
         .catch((error) => update({ error }))

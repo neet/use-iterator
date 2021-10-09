@@ -3,38 +3,31 @@ import { renderHook } from '@testing-library/react-hooks';
 
 import { useAsyncGenerator } from './useAsyncGenerator';
 
+async function* generator() {
+  yield 'a';
+  yield 'b';
+  yield 'c';
+}
+
 test('useAsyncGenerator', async () => {
-  const { result, waitForNextUpdate } = renderHook(
+  const { result } = renderHook(
     (props) => useAsyncGenerator<string>(...props),
-    {
-      initialProps: [
-        async function* () {
-          yield 'a';
-          yield 'b';
-          yield 'c';
-        },
-        [],
-      ] as const,
-    },
+    { initialProps: [generator, []] as const },
   );
 
-  act(result.current.next);
-  await waitForNextUpdate();
+  await act(result.current.next);
   expect(result.current.value).toBe('a');
   expect(result.current.done).toBe(false);
 
-  act(result.current.next);
-  await waitForNextUpdate();
+  await act(result.current.next);
   expect(result.current.value).toBe('b');
   expect(result.current.done).toBe(false);
 
-  act(result.current.next);
-  await waitForNextUpdate();
+  await act(result.current.next);
   expect(result.current.value).toBe('c');
   expect(result.current.done).toBe(false);
 
-  act(result.current.next);
-  await waitForNextUpdate();
+  await act(result.current.next);
   expect(result.current.value).toBeUndefined();
   expect(result.current.done).toBe(true);
 });

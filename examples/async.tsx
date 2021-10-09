@@ -1,62 +1,35 @@
-import React, { useEffect } from 'react';
 import { render } from 'react-dom';
-import { useAsync } from 'react-use';
-import { FacadeRepositories, login, Status } from 'masto';
-import { useAsyncGenerator } from '../src';
+import { useForAwaitOf } from '../src';
 
-type TimelineProps = {
-  masto: FacadeRepositories;
-}
+const delay = (timeout: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, timeout));
 
-const Timeline = (props: TimelineProps) => {
-  const { masto } = props;
+const asyncIterable = (async function* () {
+  yield 'a';
+  await delay(1000);
 
-  const iteratorResult = useAsyncGenerator<Status[], unknown, undefined>(
-    () => masto.timelines.getTagIterable('mastodon'),
-    [masto]
-  );
+  yield 'b';
+  await delay(1000);
 
-  useEffect(() => {
-    iteratorResult.next();
-  }, [iteratorResult.next]);
+  yield 'c';
+  await delay(1000);
 
-  if (iteratorResult.done) {
-    return <span>done</span>
-  }
+  yield 'd';
+  await delay(1000);
+})();
 
-  if (iteratorResult.loading || iteratorResult.value == null) {
-    return <span>loading</span>
-  }
+export const App = () => {
+  const iteratorResult = useForAwaitOf(asyncIterable);
+
+  console.log(JSON.stringify(iteratorResult, null, 2));
 
   return (
     <div>
-      <button onClick={() => iteratorResult.next()}>next</button>
-
-      <ul>
-        {iteratorResult.value.map(t => (
-          <li key={t.id}>
-            <p dangerouslySetInnerHTML={{__html: t.content}} />
-          </li>
-        ))}
-      </ul>
+      <output>
+        {iteratorResult.value ?? 'none'}
+      </output>
     </div>
   );
-}
-
-export const App = () => {
-  const res = useAsync(() => login({
-    url: 'https://mastodon.social',
-  }), []);
-
-  if (res.loading) {
-    return <span>loading...</span>
-  }
-
-  if (res.value == null) {
-    return <span>error</span>
-  }
-
-  return <Timeline masto={res.value} />
 }
 
 render(<App />, document.getElementById('root'));
