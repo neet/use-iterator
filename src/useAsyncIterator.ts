@@ -79,7 +79,6 @@ export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
       return asyncIterator
         .return?.(value)
         .then((r) => update({ value: r.value, done: r.done }))
-        .catch((error) => update({ error }))
         .finally(() => update({ loading: false }));
     },
     [asyncIterator, update],
@@ -91,7 +90,6 @@ export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
 
       return asyncIterator
         .throw?.(value)
-        .then((r) => update({ value: r.value, done: r.done }))
         .catch((error) => update({ error }))
         .finally(() => update({ loading: false }));
     },
@@ -102,6 +100,7 @@ export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
     () => ({
       done: result.done,
       value: result.value,
+      error: result.error,
       loading: result.loading,
       next,
       return: return_,

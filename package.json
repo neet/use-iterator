@@ -67,6 +67,7 @@
     ],
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
+      "!src/index.ts",
       "!**/*.d.ts",
       "!**/node_modules/**"
     ]

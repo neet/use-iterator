@@ -29,7 +29,7 @@ type ReducerState<T, TReturn> = {
 
 const reducer = <T, TReturn>(
   s: ReducerState<T, TReturn>,
-  v: Partial<ReducerState<T, TReturn>>,
+  v: Partial<ReducerState<T, TReturn>> | undefined,
 ): ReducerState<T, TReturn> => {
   const next = { ...s, ...v };
   return next;
@@ -39,32 +39,29 @@ export const useIterator = <T, TReturn = void, TNext = undefined>(
   iterator: Iterator<T, TReturn, TNext>,
 ): UseIteratorResponse<T, TReturn, TNext> => {
   const initialState = useMemo(() => iterator.next(), []);
-  const [result, dispatch] = useReducer(reducer, initialState);
+  const [result, update] = useReducer(reducer, initialState);
 
   const next = useCallback(
     (next?: TNext) => {
       const res = iterator.next(next as TNext);
-      dispatch(res);
+      update(res);
     },
-    [iterator, dispatch],
+    [iterator, update],
   );
 
   const return_ = useCallback(
     (value: TReturn) => {
       const res = iterator.return?.(value);
-      if (res == null) return;
-      dispatch(res);
+      update(res);
     },
-    [iterator, dispatch],
+    [iterator, update],
   );
 
   const throw_ = useCallback(
     (error: unknown) => {
-      const res = iterator.throw?.(error);
-      if (res == null) return;
-      dispatch(res);
+      iterator.throw?.(error);
     },
-    [iterator, dispatch],
+    [iterator, update],
   );
 
   return useMemo(
