@@ -1,26 +1,26 @@
 import { useCallback, useMemo, useReducer } from 'react';
 
 export interface BaseUseIteratorResponse<TReturn, TNext> {
-  next: (...args: TNext extends undefined ? [] : [TNext]) => void;
+  next: (...args: TNext extends void ? [] : [TNext]) => void;
   return: (arg: TReturn) => void;
   throw: (arg: unknown) => void;
 }
 
 export interface UseIteratorIncompleteResponse<T, TReturn, TNext>
   extends BaseUseIteratorResponse<TReturn, TNext> {
-  done: false | undefined;
-  value: T;
+  done: false;
+  value: Exclude<T | TReturn, void>;
 }
 
-export interface UseIteratorCompleteResponse<TReturn, TNext>
+export interface UseIteratorCompleteResponse<T, TReturn, TNext>
   extends BaseUseIteratorResponse<TReturn, TNext> {
   done: true;
-  value: TReturn;
+  value: Exclude<T | TReturn, void>;
 }
 
 export type UseIteratorResponse<T, TReturn, TNext> =
   | UseIteratorIncompleteResponse<T, TReturn, TNext>
-  | UseIteratorCompleteResponse<TReturn, TNext>;
+  | UseIteratorCompleteResponse<T, TReturn, TNext>;
 
 type ReducerState<T, TReturn> = {
   value: T | TReturn;
@@ -29,48 +29,45 @@ type ReducerState<T, TReturn> = {
 
 const reducer = <T, TReturn>(
   s: ReducerState<T, TReturn>,
-  v: Partial<ReducerState<T, TReturn>>,
+  v: Partial<ReducerState<T, TReturn>> | undefined,
 ): ReducerState<T, TReturn> => {
   const next = { ...s, ...v };
   return next;
 };
 
-export const useIterator = <T, TReturn = void, TNext = undefined>(
+export const useIterator = <T, TReturn = void, TNext = void>(
   iterator: Iterator<T, TReturn, TNext>,
 ): UseIteratorResponse<T, TReturn, TNext> => {
   const initialState = useMemo(() => iterator.next(), []);
-  const [result, dispatch] = useReducer(reducer, initialState);
+  const [result, update] = useReducer(reducer, initialState);
 
   const next = useCallback(
     (next?: TNext) => {
       const res = iterator.next(next as TNext);
-      dispatch(res);
+      update(res);
     },
-    [iterator, dispatch],
+    [iterator, update],
   );
 
   const return_ = useCallback(
     (value: TReturn) => {
       const res = iterator.return?.(value);
-      if (res == null) return;
-      dispatch(res);
+      update(res);
     },
-    [iterator, dispatch],
+    [iterator, update],
   );
 
   const throw_ = useCallback(
     (error: unknown) => {
-      const res = iterator.throw?.(error);
-      if (res == null) return;
-      dispatch(res);
+      iterator.throw?.(error);
     },
-    [iterator, dispatch],
+    [iterator, update],
   );
 
   return useMemo(
     () => ({
       done: result.done,
-      value: result.value as T,
+      value: result.value,
       next,
       return: return_,
       throw: throw_,

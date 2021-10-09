@@ -4,11 +4,42 @@
 [![CI](https://github.com/neet/use-iterator/actions/workflows/ci.yml/badge.svg)](https://github.com/neet/use-iterator/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/neet/use-iterator/branch/main/graph/badge.svg?token=TH4BNCOPMB)](https://codecov.io/gh/neet/use-iterator)
 
-React hook collections for JavaScript's Iterator/generator.
+React hooks collection for JavaScript's Iterator/generator.
+
+- [Examples](https://github.com/neet/use-iterator/tree/main/examples)
+
+#### `useForAwaitOf(asyncIterable)`
+
+Subscribes to the `asyncIterable` specified in the argument and as soon as a promise is resolved, immediately starts to await the next promise.
+
+This is similar to `for-await-of` syntax of JavaScript, but the results are wrapped in React APIs so components will be updated whenever the result changes.
+
+
+```jsx
+import { on } from 'events-to-async';
+
+const changeEvent = on((handler) => {
+  const elm = document.getElementById('text_field');
+  elm?.addEventListener('change', handler);
+  return () => elm?.removeEventListener('change', handler);
+});
+
+const App = () => {
+  // subscribe to the change events from #text_field
+  const result = useForAwaitOf(changeEvent);
+  
+  // latest change event from #text_field
+  return (
+    <span>{result.value}</span>
+  )
+}
+```
+
+> Note that this example uses an additional module [`events-to-async`](https://npm.im/events-to-async) to convert `Event` objects into `AsyncIterator`.
 
 #### `useGenerator(generator, deps)`
 
-Creates a reactive state and a dispatcher from a generator function.
+Wraps generator function into a React state. You can call `next()` to retrieve the next value, and read the latest value from the iterator via `value`.
 
 ```js
 const result = useGenerator<string>(function* () {
@@ -26,26 +57,50 @@ result.value === 'bbb';
 
 #### `useAsyncGenerator(generator, deps)`
 
-Creates a reactive state and a dispatcher from a generator function. Similar to `useGenerator` but you can yield promise from it.
+Wraps async generator function into a React state. You can call `next()` to retrieve the next value, and read the latest value from the iterator via `value`.
+
+This is similar to `useGenerator` described above, but with `async` you can return `Promise`s from the generator. This would be useful for sequential network requests such as Web APIs with pagination.
 
 ```js
-const result = useAsyncGenerator<string>(function* () {
-  yield fetch('https://example.com/1').then((r) => r.json());
-  yield fetch('https://example.com/2').then((r) => r.json());
-  yield fetch('https://example.com/3').then((r) => r.json());
-}, []);
 
-result.next();
-result.loading; // equals to true while loading
-result.value; // equals to the response from the URL above
+const App = () => {
+  const result = useAsyncGenerator<string>(function* () {
+    yield fetch('https://example.com?page=1');
+    yield fetch('https://example.com?page=2');
+    yield fetch('https://example.com?page=3');
+  }, []);
+
+  const handleNext = () => {
+    result.next();
+  }
+
+  if (result.loading) {
+    return <span>Loading...</span>
+  }
+
+  return (
+    <div>
+      <ul>
+        {result.value.map((item) => (
+          <li>...</li>
+        ))}
+      </ul>
+
+      <button onClick={handleNext}>
+        Next
+      </button>
+    </div>
+  );
+};
 ```
 
 #### `useIterable(iterable)`
 
-Creates a reactive state and a dispatcher from a iterable object.
+Wraps iterable into a React state. You can call `next()` to retrieve the next value, and read the latest value from the iterator via `value`.
+
+Argument can be any object that implements `[Symbol.iterator]` protocol such as `String` and `Array`.
 
 ```js
-// Argument can be anything that implements Symbol.iterator
 const result = useIterable("abcd");
 
 result.next();
@@ -57,11 +112,11 @@ result.value === 'b';
 
 #### `useAsyncIterable(asyncIterable)`
 
-Creates a reactive state and a dispatcher from a iterable object. Similar to `useIterable` but you can yield promise from it.
+Wraps async iterable into a React state. You can call `next()` to retrieve the next value, and read the latest value from the iterator via `value`.
+
+Argument can be any object that implements `[Symbol.asyncIterator]` protocol.
 
 ```js
-// Argument can be anything that can be used with for-await-of syntax
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of
 const result = useAsyncIterable({
   [Symbol.asyncIterator]() {
     return {
@@ -78,7 +133,7 @@ const result = useAsyncIterable({
 });
 
 result.next();
-result.loading; // equals to true while loading
+result.loading; // === true while loading
 result.value === 1;
 ```
 

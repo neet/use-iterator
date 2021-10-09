@@ -1,5 +1,4 @@
-import { useCallback, useMemo, useReducer } from 'react';
-import { UseIteratorResponse } from './useIterator';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 
 // --- reducer
 type ReducerState<T, TReturn> = {
@@ -24,35 +23,63 @@ const initialState: ReducerState<unknown, unknown> = {
   loading: false,
 };
 
-// -- response
-export type UseAsyncIteratorLoadingResponse<T, TReturn, TNext> =
-  UseIteratorResponse<T, TReturn, TNext> & {
-    value: T | TReturn | undefined;
+// --- response
+export interface BaseUseAsyncIteratorResponse<TReturn, TNext> {
+  error?: unknown;
+  next: (...args: TNext extends void ? [] : [TNext]) => Promise<void>;
+  return: (arg: TReturn) => Promise<void>;
+  throw: (arg: unknown) => Promise<void>;
+}
+
+export type UseAsyncIteratorLoadingIncompleteResponse<T, TReturn, TNext> =
+  BaseUseAsyncIteratorResponse<TReturn, TNext> & {
+    value: Exclude<T | TReturn, void> | undefined;
     loading: true;
-    error?: unknown;
+    done: false;
   };
 
-export type UseAsyncIteratorLoadedResponse<T, TReturn, TNext> =
-  UseIteratorResponse<T, TReturn, TNext> & {
-    value: T | TReturn;
+export type UseAsyncIteratorLoadingCompleteResponse<T, TReturn, TNext> =
+  BaseUseAsyncIteratorResponse<TReturn, TNext> & {
+    value: Exclude<T | TReturn, void>;
+    loading: true;
+    done: true;
+  };
+
+export type UseAsyncIteratorLoadedIncompleteResponse<T, TReturn, TNext> =
+  BaseUseAsyncIteratorResponse<TReturn, TNext> & {
+    value: Exclude<T | TReturn, void>;
     loading: false;
-    error?: unknown;
+    done: false;
+  };
+
+export type UseAsyncIteratorLoadedCompleteResponse<T, TReturn, TNext> =
+  BaseUseAsyncIteratorResponse<TReturn, TNext> & {
+    value: Exclude<T | TReturn, void>;
+    loading: false;
+    done: true;
   };
 
 export type UseAsyncIteratorResponse<T, TReturn, TNext> =
-  | UseAsyncIteratorLoadingResponse<T, TReturn, TNext>
-  | UseAsyncIteratorLoadedResponse<T, TReturn, TNext>;
+  | UseAsyncIteratorLoadingIncompleteResponse<T, TReturn, TNext>
+  | UseAsyncIteratorLoadingCompleteResponse<T, TReturn, TNext>
+  | UseAsyncIteratorLoadedIncompleteResponse<T, TReturn, TNext>
+  | UseAsyncIteratorLoadedCompleteResponse<T, TReturn, TNext>;
 
-export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
+// --- hook
+export const useAsyncIterator = <T, TReturn = void, TNext = void>(
   asyncIterator: AsyncIterator<T, TReturn, TNext>,
 ): UseAsyncIteratorResponse<T, TReturn, TNext> => {
   const [result, update] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    update(initialState);
+  }, [asyncIterator]);
 
   const next = useCallback(
     (arg?: TNext) => {
       update({ loading: true });
 
-      void asyncIterator
+      return asyncIterator
         .next(arg as TNext)
         .then((r) => update({ value: r.value, done: r.done }))
         .catch((error) => update({ error }))
@@ -62,25 +89,23 @@ export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
   );
 
   const return_ = useCallback(
-    async (value: TReturn) => {
+    (value: TReturn) => {
       update({ loading: true });
 
-      void asyncIterator
+      return asyncIterator
         .return?.(value)
         .then((r) => update({ value: r.value, done: r.done }))
-        .catch((error) => update({ error }))
         .finally(() => update({ loading: false }));
     },
     [asyncIterator, update],
   );
 
   const throw_ = useCallback(
-    async (value: unknown) => {
+    (value: unknown) => {
       update({ loading: true });
 
-      void asyncIterator
+      return asyncIterator
         .throw?.(value)
-        .then((r) => update({ value: r.value, done: r.done }))
         .catch((error) => update({ error }))
         .finally(() => update({ loading: false }));
     },
@@ -91,6 +116,7 @@ export const useAsyncIterator = <T, TReturn = void, TNext = undefined>(
     () => ({
       done: result.done,
       value: result.value,
+      error: result.error,
       loading: result.loading,
       next,
       return: return_,
