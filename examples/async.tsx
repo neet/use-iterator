@@ -25,9 +25,11 @@ export const App = () => {
 
   return (
     <div>
-      <output>
-        {iteratorResult.value ?? 'none'}
-      </output>
+      {!iteratorResult.loading && (
+        <output>
+          {iteratorResult.value}
+        </output>
+      )}
     </div>
   );
 }

@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useAsyncIterator, UseAsyncIteratorResponse } from './useAsyncIterator';
 
-export type UseForAwaitOfCallback = <T>(args: T) => unknown;
-
 export const useForAwaitOf = <T>(
   asyncIterator: AsyncIterator<T>,
 ): UseAsyncIteratorResponse<T, void, undefined> => {

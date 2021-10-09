@@ -3,16 +3,15 @@ import { renderHook } from '@testing-library/react-hooks';
 
 import { useGenerator } from './useGenerator';
 
+function* generator() {
+  yield 'a';
+  yield 'b';
+  yield 'c';
+}
+
 test('useGenerator', () => {
-  const { result } = renderHook((p) => useGenerator<string>(...p), {
-    initialProps: [
-      function* () {
-        yield 'a';
-        yield 'b';
-        yield 'c';
-      },
-      [],
-    ] as const,
+  const { result } = renderHook((props) => useGenerator<string>(...props), {
+    initialProps: [generator, []] as const,
   });
 
   expect(result.current.value).toBe('a');
