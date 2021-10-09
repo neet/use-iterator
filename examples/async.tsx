@@ -21,15 +21,15 @@ const asyncIterable = (async function* () {
 export const App = () => {
   const iteratorResult = useForAwaitOf(asyncIterable);
 
-  console.log(JSON.stringify(iteratorResult, null, 2));
+  if (iteratorResult.done) {
+    return <div>done</div>;
+  }
 
   return (
     <div>
-      {!iteratorResult.loading && (
-        <output>
-          {iteratorResult.value}
-        </output>
-      )}
+      <output>
+        {iteratorResult.value}
+      </output>
     </div>
   );
 }
