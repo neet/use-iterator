@@ -42,17 +42,27 @@ const App = () => {
 Wraps generator function into a React state. You can call `next()` to retrieve the next value, and read the latest value from the iterator via `value`.
 
 ```js
-const result = useGenerator<string>(function* () {
-  yield 'aaa';
-  yield 'bbb';
-  yield 'ccc';
-}, []);
+const App = () => {
+  const result = useGenerator<string>(function* () {
+    yield 'Let\'s get started';
+    yield 'Choose your username';
+    yield 'Upload the avatar';
+  }, []);
 
-result.next();
-result.value === 'aaa';
+  if (result.done) {
+    return <div>Tutorial completed!</div>;
+  }
 
-result.next();
-result.value === 'bbb';
+  return (
+    <div>
+      <h2>{result.value}</h2>
+
+      <button onClick={() => result.next()}>
+        Next
+      </button>
+    </div>
+  )
+}
 ```
 
 #### `useAsyncGenerator(generator, deps)`
@@ -70,10 +80,6 @@ const App = () => {
     yield fetch('https://example.com?page=3');
   }, []);
 
-  const handleNext = () => {
-    result.next();
-  }
-
   if (result.loading) {
     return <span>Loading...</span>
   }
@@ -86,7 +92,7 @@ const App = () => {
         ))}
       </ul>
 
-      <button onClick={handleNext}>
+      <button onClick={()) => result.next()}>
         Next
       </button>
     </div>
