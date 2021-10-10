@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/neet/use-iterator/compare/v1.0.0...v1.1.0) (2021-10-10)
+
+
+### Bug Fixes
+
+* Fix type parameters ([88f9c52](https://github.com/neet/use-iterator/commit/88f9c524b677f53abc91687994db1f88af1073b7))
+
+
+### Features
+
+* Support for-await-of syntax ([3abb289](https://github.com/neet/use-iterator/commit/3abb289e0d07990aa945e008cfd79966593cacaf))
+
 # 1.0.0 (2021-08-21)
 
 
