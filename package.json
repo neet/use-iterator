@@ -38,7 +38,7 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "events-to-async": "^1.0.1",
-    "jest": "^27.0.6",
+    "jest": "^27.4.7",
     "parcel": "^2.0.0-rc.0",
     "prettier": "^2.3.2",
     "react": "^17.0.2",
