@@ -1,11 +1,12 @@
-import { DependencyList, useCallback, useMemo } from 'react';
+import { DependencyList } from 'react';
 import { useIterator, UseIteratorResponse } from './useIterator';
+import { FactoryOrInstance } from './types';
+import { useOptionalFactory } from './useOptionalFactory';
 
 export const useGenerator = <T, TReturn = void, TNext = void>(
-  fn: () => Generator<T, TReturn, TNext>,
-  deps: DependencyList,
+  fn: FactoryOrInstance<Generator<T, TReturn, TNext>>,
+  deps?: DependencyList,
 ): UseIteratorResponse<T, TReturn, TNext> => {
-  const generator = useCallback(() => fn(), deps);
-  const iterator = useMemo(() => generator(), [generator]);
-  return useIterator(iterator);
+  const generator = useOptionalFactory(fn, deps);
+  return useIterator(generator, []);
 };

@@ -8,12 +8,11 @@ React hooks collection for JavaScript's Iterator/generator.
 
 - [Examples](https://github.com/neet/use-iterator/tree/main/examples)
 
-#### `useForAwaitOf(asyncIterable)`
+#### `useForAwaitOf(asyncIterable, deps)`
 
 Subscribes to the `asyncIterable` specified in the argument and as soon as a promise is resolved, immediately starts to await the next promise.
 
 This is similar to `for-await-of` syntax of JavaScript, but the results are wrapped in React APIs so components will be updated whenever the result changes.
-
 
 ```jsx
 import { on } from 'events-to-async';
@@ -27,12 +26,10 @@ const changeEvent = on((handler) => {
 const App = () => {
   // subscribe to the change events from #text_field
   const result = useForAwaitOf(changeEvent);
-  
+
   // latest change event from #text_field
-  return (
-    <span>{result.value}</span>
-  )
-}
+  return <span>{result.value}</span>;
+};
 ```
 
 > Note that this example uses an additional module [`events-to-async`](https://npm.im/events-to-async) to convert `Event` objects into `AsyncIterator`.
@@ -43,11 +40,15 @@ Wraps generator function into a React state. You can call `next()` to retrieve t
 
 ```js
 const App = () => {
-  const result = useGenerator<string>(function* () {
-    yield 'Let\'s get started';
-    yield 'Choose your username';
-    yield 'Upload the avatar';
-  }, []);
+  const result =
+    useGenerator <
+    string >
+    (function* () {
+      yield "Let's get started";
+      yield 'Choose your username';
+      yield 'Upload the avatar';
+    },
+    []);
 
   if (result.done) {
     return <div>Tutorial completed!</div>;
@@ -57,12 +58,10 @@ const App = () => {
     <div>
       <h2>{result.value}</h2>
 
-      <button onClick={() => result.next()}>
-        Next
-      </button>
+      <button onClick={() => result.next()}>Next</button>
     </div>
-  )
-}
+  );
+};
 ```
 
 #### `useAsyncGenerator(generator, deps)`
@@ -100,14 +99,14 @@ const App = () => {
 };
 ```
 
-#### `useIterable(iterable)`
+#### `useIterable(iterable, deps)`
 
 Wraps iterable into a React state. You can call `next()` to retrieve the next value, and read the latest value from the iterator via `value`.
 
 Argument can be any object that implements `[Symbol.iterator]` protocol such as `String` and `Array`.
 
 ```js
-const result = useIterable("abcd");
+const result = useIterable('abcd');
 
 result.next();
 result.value === 'a';
@@ -116,7 +115,7 @@ result.next();
 result.value === 'b';
 ```
 
-#### `useAsyncIterable(asyncIterable)`
+#### `useAsyncIterable(asyncIterable, deps)`
 
 Wraps async iterable into a React state. You can call `next()` to retrieve the next value, and read the latest value from the iterator via `value`.
 
@@ -133,9 +132,9 @@ const result = useAsyncIterable({
         }
 
         return Promise.resolve({ done: true });
-      }
+      },
     };
-  }
+  },
 });
 
 result.next();
@@ -143,7 +142,7 @@ result.loading; // === true while loading
 result.value === 1;
 ```
 
-#### `useIterator(iterator)`
+#### `useIterator(iterator, deps)`
 
 A low-level hook for `useIterable` and `useGenerator`. Accepts iterator object and returns a reactive state and a dispatcher.
 
@@ -155,7 +154,7 @@ const result = useIterator({
 });
 ```
 
-#### `useAsyncIterator(iterator)`
+#### `useAsyncIterator(asyncIterator, deps)`
 
 A low-level hook for `useAsyncIterable` and `useAsyncGenerator`. Accepts async iterator object and returns a reactive state and a dispatcher.
 

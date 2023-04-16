@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act, waitFor } from '@testing-library/react';
 
 import { useForAwaitOf } from './useForAwaitOf';
 
@@ -21,36 +21,47 @@ const asyncIterable = async function* () {
 jest.useFakeTimers();
 
 test('useForAwaitOf', async () => {
-  const { result, waitForNextUpdate } = renderHook(
-    (prop) => useForAwaitOf<string>(prop),
-    { initialProps: asyncIterable() },
-  );
+  const { result } = renderHook((prop) => useForAwaitOf<string>(prop), {
+    initialProps: asyncIterable(),
+  });
 
   expect(result.current.value).toBeUndefined();
   expect(result.current.loading).toBe(true);
   expect(result.current.done).toBe(false);
 
-  act(() => void jest.advanceTimersByTime(1000));
-  await waitForNextUpdate();
-  expect(result.current.value).toBe('a');
-  expect(result.current.loading).toBe(true);
-  expect(result.current.done).toBe(false);
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+  await waitFor(() => {
+    expect(result.current.value).toBe('a');
+    expect(result.current.loading).toBe(true);
+    expect(result.current.done).toBe(false);
+  });
 
-  act(() => void jest.advanceTimersByTime(1000));
-  await waitForNextUpdate();
-  expect(result.current.value).toBe('b');
-  expect(result.current.loading).toBe(true);
-  expect(result.current.done).toBe(false);
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+  await waitFor(() => {
+    expect(result.current.value).toBe('b');
+    expect(result.current.loading).toBe(true);
+    expect(result.current.done).toBe(false);
+  });
 
-  act(() => void jest.advanceTimersByTime(1000));
-  await waitForNextUpdate();
-  expect(result.current.value).toBe('c');
-  expect(result.current.loading).toBe(true);
-  expect(result.current.done).toBe(false);
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+  await waitFor(() => {
+    expect(result.current.value).toBe('c');
+    expect(result.current.loading).toBe(true);
+    expect(result.current.done).toBe(false);
+  });
 
-  act(() => void jest.advanceTimersByTime(1000));
-  await waitForNextUpdate();
-  expect(result.current.value).toBeUndefined();
-  expect(result.current.loading).toBe(false);
-  expect(result.current.done).toBe(true);
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+  await waitFor(() => {
+    expect(result.current.value).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+    expect(result.current.done).toBe(true);
+  });
 });

@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useReducer } from 'react';
+import {
+  DependencyList,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
+import { FactoryOrInstance } from './types';
+import { useOptionalFactory } from './useOptionalFactory';
 
 // --- reducer
 type ReducerState<T, TReturn> = {
@@ -67,8 +75,10 @@ export type UseAsyncIteratorResponse<T, TReturn, TNext> =
 
 // --- hook
 export const useAsyncIterator = <T, TReturn = void, TNext = void>(
-  asyncIterator: AsyncIterator<T, TReturn, TNext>,
+  fn: FactoryOrInstance<AsyncIterator<T, TReturn, TNext>>,
+  deps?: DependencyList,
 ): UseAsyncIteratorResponse<T, TReturn, TNext> => {
+  const asyncIterator = useOptionalFactory(fn, deps);
   const [result, update] = useReducer(reducer, initialState);
 
   useEffect(() => {

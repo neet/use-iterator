@@ -1,11 +1,12 @@
-import { DependencyList, useCallback, useMemo } from 'react';
-import { useAsyncIterator, UseAsyncIteratorResponse } from './useAsyncIterator';
+import { DependencyList } from 'react';
+import { UseAsyncIteratorResponse, useAsyncIterator } from './useAsyncIterator';
+import { useOptionalFactory } from './useOptionalFactory';
+import { FactoryOrInstance } from './types';
 
 export const useAsyncGenerator = <T, TReturn = void, TNext = void>(
-  fn: () => AsyncGenerator<T, TReturn, TNext>,
-  deps: DependencyList,
+  fn: FactoryOrInstance<AsyncGenerator<T, TReturn, TNext>>,
+  deps?: DependencyList,
 ): UseAsyncIteratorResponse<T, TReturn, TNext> => {
-  const asyncGenerator = useCallback(() => fn(), deps);
-  const asyncIterator = useMemo(() => asyncGenerator(), [asyncGenerator]);
-  return useAsyncIterator(asyncIterator);
+  const generator = useOptionalFactory(fn, deps);
+  return useAsyncIterator(generator, []);
 };

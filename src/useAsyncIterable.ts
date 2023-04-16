@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
 import { useAsyncIterator, UseAsyncIteratorResponse } from './useAsyncIterator';
+import { FactoryOrInstance } from './types';
+import { useOptionalFactory } from './useOptionalFactory';
+import { DependencyList } from 'react';
 
 export const useAsyncIterable = <T>(
-  iterable: AsyncIterable<T>,
+  fn: FactoryOrInstance<AsyncIterable<T>>,
+  deps?: DependencyList,
 ): UseAsyncIteratorResponse<T, void, void> => {
-  const iterator = useMemo(() => {
-    return iterable[Symbol.asyncIterator]();
-  }, [iterable]);
-
-  return useAsyncIterator(iterator);
+  const iterable = useOptionalFactory(fn, deps);
+  return useAsyncIterator(iterable[Symbol.asyncIterator].bind(iterable), []);
 };

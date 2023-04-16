@@ -1,4 +1,6 @@
-import { useCallback, useMemo, useReducer } from 'react';
+import { DependencyList, useCallback, useMemo, useReducer } from 'react';
+import { FactoryOrInstance } from './types';
+import { useOptionalFactory } from './useOptionalFactory';
 
 export interface BaseUseIteratorResponse<TReturn, TNext> {
   next: (...args: TNext extends void ? [] : [TNext]) => void;
@@ -36,8 +38,10 @@ const reducer = <T, TReturn>(
 };
 
 export const useIterator = <T, TReturn = void, TNext = void>(
-  iterator: Iterator<T, TReturn, TNext>,
+  fn: FactoryOrInstance<Iterator<T, TReturn, TNext>>,
+  deps?: DependencyList,
 ): UseIteratorResponse<T, TReturn, TNext> => {
+  const iterator = useOptionalFactory(fn, deps);
   const initialState = useMemo(() => iterator.next(), []);
   const [result, update] = useReducer(reducer, initialState);
 
