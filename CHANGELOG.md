@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/neet/use-iterator/compare/v1.1.1...v1.2.0) (2023-04-21)
+
+
+### Features
+
+* Support passing factory ([81cce39](https://github.com/neet/use-iterator/commit/81cce39dcef4c017929d94ea5967983d0320628e))
+
 ## [1.1.1](https://github.com/neet/use-iterator/compare/v1.1.0...v1.1.1) (2021-11-01)
 
 # [1.1.0](https://github.com/neet/use-iterator/compare/v1.0.0...v1.1.0) (2021-10-10)
